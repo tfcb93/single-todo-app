@@ -12,7 +12,7 @@ void showActions() {
     printf("7 - Quit\n");
 }
 
-void checkChosenAction(int opt, std::vector<char*> *list, std::unordered_set<int> * doneList) {
+void checkChosenAction(int opt, std::vector<std::string> *list, std::unordered_set<int> * doneList) {
     switch (opt)
     {
     case 1:
@@ -30,10 +30,10 @@ void checkChosenAction(int opt, std::vector<char*> *list, std::unordered_set<int
         deleteListElement(list, doneList);
         break;
     case 5:
-        printf("You choose load a task board\n");
+        loadList(list, doneList);
         break;
     case 6:
-        printf("You choose save the task board\n");
+        saveList(list, doneList);
         break;
     case 7:
         printf("You choose to quit the application. Goodbye.\n");
@@ -45,21 +45,21 @@ void checkChosenAction(int opt, std::vector<char*> *list, std::unordered_set<int
     }
 }
 
-void addItemToList(std::vector<char*>* list) {
-    
-    char* input = new char[100];
+void addItemToList(std::vector<std::string>* list) {
+    std::string input;
     
     printf("Please insert what you want inside the list: ");
-    std::cin >> input;
+    std::getline(std::cin, input);
+    // std::cin >> input;
 
     list->push_back(input);
 }
 
-void printList(std::vector<char*> list, std::unordered_set<int> * doneList) {
+void printList(std::vector<std::string> *list, std::unordered_set<int> * doneList) {
     printf("What is in the list: \n");
     int index = 1;
-    for (const char* c : list) {
-        printf("%d - %s", index, c);
+    for (const std::string c : *list) {
+        printf("%d - %s", index, c.c_str());
         if (doneList->count(index) > 0) {
             printf(" - DONE");
         }
@@ -68,7 +68,7 @@ void printList(std::vector<char*> list, std::unordered_set<int> * doneList) {
     }
 }
 
-void deleteListElement(std::vector<char*>* list, std::unordered_set<int> * doneList) {
+void deleteListElement(std::vector<std::string>* list, std::unordered_set<int> * doneList) {
     int index;
     printf("Please enter the number of the element you want to remove from the list");
     std::cin >> index;
@@ -89,7 +89,7 @@ void deleteListElement(std::vector<char*>* list, std::unordered_set<int> * doneL
     return;
 }
 
-void changeListElement(std::vector<char*>* list) {
+void changeListElement(std::vector<std::string>* list) {
         int index;
     printf("Please enter the number of the element you want to remove from the list: ");
     std::cin >> index;
@@ -102,11 +102,14 @@ void changeListElement(std::vector<char*>* list) {
             printf("Invalid index\n");
             return;
         }
-        char* edit = list->at(index - 1);
-        printf("Edit entry %s: \n", edit);
-        std::cin >> edit; // TODO: See how to show the previous value on CIN or somehow
+        std::cin.ignore();
+        std::string edit = list->at(index - 1);
+        printf("Edit entry %s: \n", edit.c_str());
+        std::getline(std::cin, edit);
+        list->erase(list->begin() + index - 1);
+        list->insert(list->begin() + index - 1, edit);
+
     }
-    return;
 }
 
 // decided to go with this approach instead of passing the whole list inside the function
@@ -128,4 +131,53 @@ void markElementAsDone(std::unordered_set<int> * doneList, int max_value) {
         return;
     }
     doneList->insert(index);
+}
+
+void loadList(std::vector<std::string> * list, std::unordered_set<int> * done) {
+    std::string option = "";
+    std::ifstream file;
+    std::string line;
+    bool gotFirstLine = false;
+
+    printf("Continue with this operation will delete the current TODO list, are you ok with that? [Y]es/[N]o: ");
+    std::cin >> option;
+
+    if (option == "Yes" || option == "yes" || option == "Y" || option == "y") {
+        list->clear();
+        done->clear();
+        file.open("list.txt");
+        if(file.is_open()) {
+            while(!file.eof()) {
+                getline(file, line);
+                if(!gotFirstLine) {
+                    std::cout << "First line is: " << line << '\n';
+                    gotFirstLine = true;
+                    continue;
+                }
+                list->push_back(line);
+            }
+            file.close();
+        }
+        return;
+    }
+    if (option == "NO" || option == "no" || option == "N" || option == "n"){
+        printf("Load aborted.\n");
+        return;
+    }
+    printf("Instruction not clear. Load aborted.\n");
+    return;
+}
+
+void saveList(std::vector<std::string> * list, std::unordered_set<int> * done) {
+    std::ofstream file;
+    file.open("list.txt");
+    for(const int d : *done) {
+        file << d << ',';
+    }
+    file << "\n";
+    for(const std::string item : *list) {
+        file << item << "\n";
+    }
+    file.close();
+    return;
 }

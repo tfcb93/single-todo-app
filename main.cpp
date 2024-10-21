@@ -8,7 +8,7 @@
 
 int main(int argc, char** argv) {
 
-    std::vector<char*> a{};
+    std::vector<std::string> a{};
     std::unordered_set<int> done{};
 
     bool run = true;
@@ -19,9 +19,10 @@ int main(int argc, char** argv) {
     int actionInput = 0;
 
     while(run) {
-        printList(a, &done);
+        printList(&a, &done);
         showActions();
         std::cin >> actionInput;
+        std::cin.ignore(); // removes the last "break of line"
         if (!std::cin) {
             std::cout << "Wrong value \n";
             std::cin.clear();
