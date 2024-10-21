@@ -70,7 +70,7 @@ void printList(std::vector<std::string> *list, std::unordered_set<int> * doneLis
 
 void deleteListElement(std::vector<std::string>* list, std::unordered_set<int> * doneList) {
     int index;
-    printf("Please enter the index (1 - %d) of the element you want to remove from the list: ", list->size());
+    printf("Please enter the index (1 - %d) of the element you want to remove from the list: ", (int)list->size());
     std::cin >> index;
     if (!std::cin) {
             std::cout << "Wrong value \n";
@@ -90,8 +90,8 @@ void deleteListElement(std::vector<std::string>* list, std::unordered_set<int> *
 }
 
 void changeListElement(std::vector<std::string>* list) {
-        int index;
-    printf("Please enter the index (1 - %d) of the element you want to remove from the list: ", list->size());
+    int index;
+    printf("Please enter the index (1 - %d) of the element you want to remove from the list: ", (int)list->size());
     std::cin >> index;
     if (!std::cin) {
             std::cout << "Wrong value \n";
