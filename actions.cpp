@@ -151,11 +151,20 @@ void loadList(std::vector<std::string> * list, std::unordered_set<int> * done) {
             while(!file.eof()) {
                 getline(file, line);
                 if(!gotFirstLine) {
-                    std::cout << "First line is: " << line << '\n';
                     gotFirstLine = true;
+
+                    // convert each number in the first line for the done set
+                    for(const char val: line) {
+                        if(val != ',') {
+                            done->insert((int)val  - '0');
+                        }
+                    }
+
                     continue;
                 }
-                list->push_back(line);
+                if (!line.empty()){
+                    list->push_back(line);
+                }
             }
             file.close();
         }
