@@ -1,48 +1,23 @@
 #include "actions.h"
+#include "utils.h"
 
-void showActions() {
-    printf("\n");
-    printf("Choose one of the following actions\n");
-    printf("1 - Insert new task\n");
-    printf("2 - Edit task\n");
-    printf("3 - Mark task as done\n");
-    printf("4 - Delete task\n");
-    printf("5 - Load\n");
-    printf("6 - Save\n");
-    printf("7 - Quit\n");
-}
-
-void checkChosenAction(int opt, std::vector<std::string> *list, std::unordered_set<int> * doneList) {
-    switch (opt)
-    {
-    case 1:
-        printf("You choose insert a new task\n");
-        addItemToList(list);
-        break;
-    case 2:
-        printf("You choose edit a task\n");
-        changeListElement(list);
-        break;
-    case 3:
-        markElementAsDone(doneList, list);
-        break;
-    case 4:
-        deleteListElement(list, doneList);
-        break;
-    case 5:
-        loadList(list, doneList);
-        break;
-    case 6:
-        saveList(list, doneList);
-        break;
-    case 7:
-        printf("You choose to quit the application. Goodbye.\n");
-        exit(1);
-        break;
-    default:
-        printf("Invalid option\n");
-        break;
+void printList(std::vector<std::string> *list, std::unordered_set<int> * doneList) {
+    printf("\n\n");
+    printf("========= TODO LIST ========= \n");
+    int index = 1;
+    if (list->size() <= 0) {
+        printf("        List is empty!  \n");
+    } else {
+        for (const std::string c : *list) {
+            printf("%d - %s", index, c.c_str());
+            if (doneList->count(index) > 0) {
+                printf(" - DONE");
+            }
+            printf("\n");
+            ++index;
+        }
     }
+    printf("============================ \n\n");
 }
 
 void addItemToList(std::vector<std::string>* list) {
@@ -50,86 +25,40 @@ void addItemToList(std::vector<std::string>* list) {
     
     printf("Please insert what you want inside the list: ");
     std::getline(std::cin, input);
-    // std::cin >> input;
 
     list->push_back(input);
 }
 
-void printList(std::vector<std::string> *list, std::unordered_set<int> * doneList) {
-    printf("What is in the list: \n");
-    int index = 1;
-    for (const std::string c : *list) {
-        printf("%d - %s", index, c.c_str());
-        if (doneList->count(index) > 0) {
-            printf(" - DONE");
-        }
-        printf("\n");
-        ++index;
-    }
-}
-
 void deleteListElement(std::vector<std::string>* list, std::unordered_set<int> * doneList) {
-    int index;
-    printf("Please enter the index (1 - %d) of the element you want to remove from the list: ", (int)list->size());
-    std::cin >> index;
-    if (!std::cin) {
-            std::cout << "Wrong value \n";
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    } else {
-        if (index - 1 < 0 || index > list->size()) {
-            printf("Invalid index\n");
-            return;
-        }
-        list->erase(list->begin() + (index - 1));
-        if(doneList->count(index) > 0) {
-            doneList->erase(doneList->find(index));
-        }
+    if (checkListIsEmpty(list)) return;
+    int index = checkActionIndex(list, "remove from the list", true);
+    if (index == -1) return;
+    list->erase(list->begin() + (index - 1));
+    if(doneList->count(index) > 0) {
+        doneList->erase(doneList->find(index));
     }
     return;
 }
 
 void changeListElement(std::vector<std::string>* list) {
-    int index;
-    printf("Please enter the index (1 - %d) of the element you want to remove from the list: ", (int)list->size());
-    std::cin >> index;
-    if (!std::cin) {
-            std::cout << "Wrong value \n";
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    } else {
-        if (index - 1 < 0 || index > list->size()) {
-            printf("Invalid index\n");
-            return;
-        }
-        std::cin.ignore();
-        std::string edit = list->at(index - 1);
-        printf("Edit entry %s: \n", edit.c_str());
-        std::getline(std::cin, edit);
-        list->erase(list->begin() + index - 1);
-        list->insert(list->begin() + index - 1, edit);
-
-    }
+    if (checkListIsEmpty(list)) return;
+    int index = checkActionIndex(list, "change", true);
+    if (index == -1) return;
+    std::string edit = list->at(index - 1);
+    printf("Edit entry %s: \n", edit.c_str());
+    std::getline(std::cin, edit);
+    list->erase(list->begin() + index - 1);
+    list->insert(list->begin() + index - 1, edit);
 }
 
-// decided to go with this approach instead of passing the whole list inside the function
 void markElementAsDone(std::unordered_set<int> * doneList, const std::vector<std::string>* list) {
-    int index = 0;
-    int max_value = list->size();
-    if (max_value <= 0) {
-        printf("There are no items to be marked as done.\n");
-        return;
-    }
-    while(index <= 0 || index > max_value) {
-        printf("Please enter the index (1 - %d) of the element you want to mark as done: ", max_value);
-        std::cin >> index;
-        if (index <= 0 || index > max_value) {
-            printf("Wrong value!\n");
-        }
-    }
-    if(doneList->count(index) > 0) {
+    if (checkListIsEmpty(list)) return;
+    int index = -2;
+    while(!checkIntInterval(1, list->size(), index) || doneList->count(index) > 0) {
+        index = checkActionIndex(list, "mark as done", true);
         printf("The element is already marked as done.\n");
-        return;
+
+        if (index == -1) return;
     }
     doneList->insert(index);
 }
@@ -156,7 +85,7 @@ void loadList(std::vector<std::string> * list, std::unordered_set<int> * done) {
                     // convert each number in the first line for the done set
                     for(const char val: line) {
                         if(val != ',') {
-                            done->insert((int)val  - '0');
+                            done->insert((int)val - '0');
                         }
                     }
 

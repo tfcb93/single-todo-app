@@ -1,10 +1,5 @@
-#include <stdio.h>
-#include<string.h>
-#include <iostream>
-#include <limits>
-#include <vector>
-#include <unordered_set>
-#include "actions.h"
+#include "menu.h"
+#include "utils.h"
 
 int main(int argc, char** argv) {
 
@@ -13,25 +8,16 @@ int main(int argc, char** argv) {
 
     bool run = true;
 
-    // char* input;
-    char input[100]; // for now I will limit input
-
-    int actionInput = 0;
+    // int actionInput = 0;
 
     while(run) {
+        // print list so far and show actions menu
         printList(&a, &done);
         showActions();
-        std::cin >> actionInput;
-        std::cin.ignore(); // removes the last "break of line"
-        if (!std::cin) {
-            std::cout << "Wrong value \n";
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        } else {
-            checkChosenAction(actionInput, &a, &done);
-        }
-    }
 
+        // check the action and use the function
+        checkChosenAction(checkUsingIntInput(), &a, &done);
+    }
 
     return 0;
 }
