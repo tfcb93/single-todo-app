@@ -24,7 +24,7 @@ void checkChosenAction(int opt, std::vector<std::string> *list, std::unordered_s
         changeListElement(list);
         break;
     case 3:
-        markElementAsDone(doneList, list->size());
+        markElementAsDone(doneList, list);
         break;
     case 4:
         deleteListElement(list, doneList);
@@ -70,7 +70,7 @@ void printList(std::vector<std::string> *list, std::unordered_set<int> * doneLis
 
 void deleteListElement(std::vector<std::string>* list, std::unordered_set<int> * doneList) {
     int index;
-    printf("Please enter the number of the element you want to remove from the list");
+    printf("Please enter the index (1 - %d) of the element you want to remove from the list: ", list->size());
     std::cin >> index;
     if (!std::cin) {
             std::cout << "Wrong value \n";
@@ -91,7 +91,7 @@ void deleteListElement(std::vector<std::string>* list, std::unordered_set<int> *
 
 void changeListElement(std::vector<std::string>* list) {
         int index;
-    printf("Please enter the number of the element you want to remove from the list: ");
+    printf("Please enter the index (1 - %d) of the element you want to remove from the list: ", list->size());
     std::cin >> index;
     if (!std::cin) {
             std::cout << "Wrong value \n";
@@ -113,14 +113,15 @@ void changeListElement(std::vector<std::string>* list) {
 }
 
 // decided to go with this approach instead of passing the whole list inside the function
-void markElementAsDone(std::unordered_set<int> * doneList, int max_value) {
+void markElementAsDone(std::unordered_set<int> * doneList, const std::vector<std::string>* list) {
     int index = 0;
+    int max_value = list->size();
     if (max_value <= 0) {
         printf("There are no items to be marked as done.\n");
         return;
     }
     while(index <= 0 || index > max_value) {
-        printf("Please enter the index (1 - %d) of the element you want to mark as done.\n", max_value);
+        printf("Please enter the index (1 - %d) of the element you want to mark as done: ", max_value);
         std::cin >> index;
         if (index <= 0 || index > max_value) {
             printf("Wrong value!\n");

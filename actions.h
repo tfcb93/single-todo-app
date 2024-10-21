@@ -14,6 +14,6 @@ void addItemToList(std::vector<std::string>*);
 void printList(std::vector<std::string>*, std::unordered_set<int> *);
 void deleteListElement(std::vector<std::string>*, std::unordered_set<int> *);
 void changeListElement(std::vector<std::string>*);
-void markElementAsDone(std::unordered_set<int> *, int);
+void markElementAsDone(std::unordered_set<int> *, const std::vector<std::string>*);
 void saveList(std::vector<std::string> *, std::unordered_set<int> *);
 void loadList(std::vector<std::string> *, std::unordered_set<int> *);
